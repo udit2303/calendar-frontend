@@ -8,11 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Event } from '../types'
 
 interface EventPopupProps {
-  selectedDate: Date
-  event?: Event
-  onSave: (event: Omit<Event, 'id'>) => void
-  onDelete?: () => void
-  onClose: () => void
+  selectedDate: Date;
+  event: Event | null; // Change this to Event | null instead of Event | undefined
+  onSave: (event: Omit<Event, 'id'>) => Promise<void>;
+  onDelete: () => Promise<void>;
+  onClose: () => void;
 }
 
 const timeOptions = Array.from({ length: 96 }, (_, i) => {

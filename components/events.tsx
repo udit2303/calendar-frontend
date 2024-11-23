@@ -33,12 +33,15 @@ export default function Events() {
           />
         </div>
         <div className="w-1/3">
+        {editingEvent &&(
           <EventForm
             event={editingEvent}
             onSubmit={editingEvent ? handleEventEdit : handleEventCreate}
             onDelete={editingEvent ? () => handleEventDelete(editingEvent.id) : undefined}
             onCancel={() => setEditingEvent(null)}
           />
+        )}
+          
         </div>
       </div>
     </Layout>

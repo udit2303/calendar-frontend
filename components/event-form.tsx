@@ -6,7 +6,7 @@ import { Event } from '../types'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 
 interface EventFormProps {
-  event: Event
+  event: Event 
   onSubmit: (event: Event) => void
   onDelete?: () => void
   onCancel: () => void
