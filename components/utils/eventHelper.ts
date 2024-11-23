@@ -1,6 +1,6 @@
 import { Event } from '@/types';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 'https://calendar-backend-tjs1.onrender.com/api';
 
 const getToken = (): string | null => typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
