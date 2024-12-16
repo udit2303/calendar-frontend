@@ -172,12 +172,7 @@ export default function Events() {
                     <Clock className="w-4 h-4 mr-2 flex-shrink-0" />
                     <span>{event.time} - {event.endTime}</span>
                   </div>
-                  {event.location && (
-                    <div className="flex items-center text-muted-foreground text-sm mb-2">
-                      <MapPin className="w-4 h-4 mr-2 flex-shrink-0" />
-                      <span className="truncate">{event.location}</span>
-                    </div>
-                  )}
+                  
                   <p className="text-sm mb-4 line-clamp-2">{event.description}</p>
                 </CardContent>
                 <CardFooter className="p-4 pt-0">

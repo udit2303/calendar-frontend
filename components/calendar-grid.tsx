@@ -171,7 +171,7 @@ export function CalendarGrid({ currentDate, setCurrentDate }: CalendarGridProps)
                         <motion.div
                           key={event.id}
                           className="text-[8px] md:text-xs bg-secondary p-0.5 rounded cursor-pointer"
-                          whileHover={{ scale: 1.05 }}
+                          whileHover={{ scale: 1.02 }}
                           onClick={(e) => handleEventClick(event, e)}
                         >
                           <div className="font-medium truncate">{event.title}</div>
