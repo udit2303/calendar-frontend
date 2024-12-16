@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { authApi } from '@/components/utils/authAPI'
-
+import { getCookie, setCookie, deleteCookie } from "cookies-next";
 interface User {
   id: string
   email: string
@@ -21,31 +21,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true) 
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      authApi.verifyToken(token)
-        .then(setUser)
-        .catch(() => localStorage.removeItem('token'))
-        .finally(() => setLoading(false))
-    } else {
-      setLoading(false)
+    const fetchToken = async () => {
+      const token = await getCookie('token')
+      if (token) {
+        authApi.verifyToken(token)
+          .then(setUser)
+          .catch(() => deleteCookie('token'))
+          .finally(() => setLoading(false))
+      } else {
+        setLoading(false)
+      }
     }
+    fetchToken()
   }, [])
 
   const login = async (email: string, password: string) => {
     const { user, token } = await authApi.login(email, password)
-    localStorage.setItem('token', token)
+    setCookie('token', token)
     setUser(user)
   }
 
   const signup = async (email: string, password: string) => {
     const { user, token } = await authApi.signup(email, password)
-    localStorage.setItem('token', token)
+    setCookie('token', token)
     setUser(user)
   }
 
   const logout = () => {
-    localStorage.removeItem('token')
+    deleteCookie('token')
     setUser(null)
   }
 

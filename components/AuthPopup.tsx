@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import { useAuth } from '@/components/utils/authContext'
 import { motion } from 'framer-motion'
 import { User, Lock } from 'lucide-react'
+import { useToast } from "@/hooks/use-toast"
 
 interface AuthPopupProps {
   isOpen: boolean
@@ -18,19 +19,34 @@ export function AuthPopup({ isOpen, onClose }: AuthPopupProps) {
   const [password, setPassword] = useState('')
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login')
   const { login, signup } = useAuth()
+  const { toast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
       if (activeTab === 'login') {
         await login(email, password)
+        toast({
+          title: "Success",
+          description: "Logged in successfully",
+          variant: "default",
+        })
       } else {
         await signup(email, password)
+        toast({
+          title: "Success",
+          description: "Signed up successfully",
+          variant: "default",
+        })
       }
       onClose()
     } catch (error) {
       console.error(`${activeTab} failed:`, error)
-      // Handle error (e.g., show error message to user)
+      toast({
+        title: "Error",
+        description: error.message || `${activeTab === 'login' ? 'Login' : 'Signup'} failed`,
+        variant: "destructive",
+      })
     }
   }
 

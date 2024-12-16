@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { format, addMinutes, differenceInMinutes } from 'date-fns'
-import { Clock, AlignLeft, Calendar } from 'lucide-react'
+import { format, addMinutes, differenceInMinutes, addDays, addHours } from 'date-fns'
+import { Clock, AlignLeft, Calendar, Slash } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -29,21 +29,32 @@ export function EventPopup({ selectedDate, event, onSave, onDelete, onClose }: E
   const [description, setDescription] = useState(event?.description || '')
 
   useEffect(() => {
-    if (event) {
-      setTitle(event.title)
-      setStartTime(event.time)
-      setEndTime(event.endTime || addMinutes(new Date(`2000-01-01 ${event.time}`), 60).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }))
-      setDescription(event.description)
-    } else {
-      setTitle('')
-      setStartTime('09:00 AM')
-      setEndTime('10:00 AM')
-      setDescription('')
+    async function loadEvents() {
+      if (event) {
+        setTitle(event.title);
+        const processed_start_time =await new Date(`2000-01-01T${event.time}`).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+        const processed_end_time = await new Date(`2000-01-01T${event.endTime}`).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }); // Won't load time without awaiting (idk why)
+        setStartTime(processed_start_time);
+        setEndTime(processed_end_time);
+        setDescription(event.description);
+        console.log(processed_start_time, processed_end_time);
+      } else {
+        setTitle('');
+        setStartTime('09:00 AM');
+        setEndTime('10:00 AM');
+        setDescription('');
+      }
     }
-  }, [event])
+    loadEvents();
+  }, [event]);
 
   const handleSubmit = (e: React.FormEvent) => {
+    // console.log(selectedDate);
+    selectedDate = addHours(selectedDate, 12);
+    console.log(selectedDate);
     e.preventDefault()
+    // increase selectedDate by 1 day to match the date format in the database
+    // selectedDate = addDays(selectedDate, 1)
     onSave({
       title,
       date: selectedDate,

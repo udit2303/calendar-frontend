@@ -53,7 +53,7 @@ export default function Calendar() {
           setCurrentDate={setCurrentDate}
           selectedDate={currentDate}
         />
-        <div className="flex-1 overflow-hidden p-6">
+        <div className="flex-1 overflow-hidden w-full">
           <CalendarGrid
             currentDate={currentDate}
             setCurrentDate={setCurrentDate}

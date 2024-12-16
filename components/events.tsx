@@ -1,48 +1,88 @@
-import { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Layout } from '../components/layout'
-import { EventList } from '../components/event-list'
-import { EventForm } from '../components/event-form'
+import { eventHelper } from '@/components/utils/eventHelper'
 import { Event } from '../types'
+import { format, parseISO } from 'date-fns'
+import { Button } from '@/components/ui/button'
+import { useAuth } from '@/components/utils/authContext'
+import { useRouter } from 'next/router'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 export default function Events() {
   const [events, setEvents] = useState<Event[]>([])
-  const [editingEvent, setEditingEvent] = useState<Event | null>(null)
+  const { user } = useAuth()
+  const router = useRouter()
 
-  const handleEventCreate = (event: Event) => {
-    setEvents([...events, event])
-    setEditingEvent(null)
+  useEffect(() => {
+    if (!user) {
+      router.push('/')
+    } else {
+      loadEvents()
+    }
+  }, [user, router])
+
+  const loadEvents = async () => {
+    try {
+      const allEvents = await eventHelper.getAllEvents()
+      setEvents(allEvents)
+    } catch (error) {
+      console.error('Failed to load events:', error)
+    }
   }
 
-  const handleEventEdit = (updatedEvent: Event) => {
-    setEvents(events.map((event) => (event.id === updatedEvent.id ? updatedEvent : event)))
-    setEditingEvent(null)
+  const handleDeleteEvent = async (id: string) => {
+    if (!id) {
+      console.error('Event ID is missing');
+      return;
+    }
+    try {
+      await eventHelper.deleteEvent(id);
+      setEvents(events.filter(event => event.id !== id));
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+    }
   }
 
-  const handleEventDelete = (eventId: string) => {
-    setEvents(events.filter((event) => event.id !== eventId))
+  if (!user) {
+    return null // or a loading spinner
   }
 
   return (
     <Layout>
-      <div className="flex h-full">
-        <div className="w-2/3 pr-4">
-          <EventList
-            events={events}
-            onEventEdit={setEditingEvent}
-            onEventDelete={handleEventDelete}
-          />
-        </div>
-        <div className="w-1/3">
-        {editingEvent &&(
-          <EventForm
-            event={editingEvent}
-            onSubmit={editingEvent ? handleEventEdit : handleEventCreate}
-            onDelete={editingEvent ? () => handleEventDelete(editingEvent.id) : undefined}
-            onCancel={() => setEditingEvent(null)}
-          />
-        )}
-          
-        </div>
+      <div className="container mx-auto p-4 h-full">
+        <h1 className="text-2xl font-bold mb-4">All Events</h1>
+        <ScrollArea className="h-[calc(100vh-8rem)] pr-4">
+          <div className="space-y-4">
+            {events.map((event) => (
+              <Card key={event.id} className="bg-background shadow">
+                <CardHeader>
+                  <CardTitle>{event.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">
+                    {format(new Date(event.date), 'MMMM d, yyyy')} at {event.time}
+                  </p>
+                  <p className="mt-2">{event.description}</p>
+                  <div className="mt-4 flex justify-end space-x-2">
+                    <Button 
+                      onClick={() => {
+                        const formattedDate = format(new Date(event.date), 'yyyy-MM-dd')
+                        router.push(`/calendar?date=${formattedDate}`)
+                      }}
+                      variant="outline"
+                    >
+                      View in Calendar
+                    </Button>
+                    <Button variant="destructive" onClick={() => handleDeleteEvent(event.id)}>
+                      Delete
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </ScrollArea>
       </div>
     </Layout>
   )
